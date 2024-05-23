@@ -18,6 +18,10 @@ const urlEveil= process.env.URLEVEILS;
 const urlAllaitement= process.env.URLALLAITEMENTS;
 const urlBiberon= process.env.URLBIBERONS;
 
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 app.get("/poussettes", async (req, res) => {
   try {
     const dataPoussette = await performScrapingVertbaudet(urlPoussette);
