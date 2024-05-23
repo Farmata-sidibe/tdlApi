@@ -8,5 +8,5 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 8080
-CMD [ "nodemon", "server.js" ]
+EXPOSE 8080 
+CMD [ "node", "server.js" ]
