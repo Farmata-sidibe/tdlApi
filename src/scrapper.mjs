@@ -21,7 +21,9 @@ export async function performScrapingVertbaudet(url) {
 
     let elements = document.querySelectorAll("div.product-content");
     for (let element of elements) {
-      let imgUrl = element.querySelector("div.picture span.picture-container img")?.getAttribute("data-frz-src");
+      // let imgUrl = element.querySelector("div.picture span.picture-container img")?.getAttribute("data-frz-src");
+      let imgUrl = element.querySelector("div.picture span.picture-container img");
+
       let brand = element.querySelector("div.product-informations div.brand a")?.textContent.trim();
       let title = element.querySelector("div.product-informations div.title a")?.textContent.trim();
       let link = element.querySelector("div.product-informations div.title a")?.href;
@@ -31,9 +33,10 @@ export async function performScrapingVertbaudet(url) {
     
       let clubPrice = element.querySelector('div.product-informations div.pricecontainer span.price-value.club-price')?.textContent.trim();
 
-      if (imgUrl.startsWith("http") || imgUrl.startsWith("https")) {
+      // if (imgUrl.startsWith("https") || imgUrl.startsWith("http")) {
         products.push({
-          img: imgUrl,
+          img: imgUrl?.getAttribute('src') || imgUrl?.getAttribute('data-src'),
+          // img: imgUrl,
           brand: brand,
           title: title,
           price: price,
@@ -42,7 +45,7 @@ export async function performScrapingVertbaudet(url) {
           // id: id,
 
         });
-      }
+      // }
     }
     return products;
   });
