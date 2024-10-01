@@ -6,7 +6,7 @@ export async function performScrapingVertbaudet(url) {
   try {
   browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  await page.goto(url);
+  await page.goto(url,{ waitUntil: 'networkidle0' });
 
   // Scroll down the page to load more products
   await page.evaluate(() => {
@@ -22,26 +22,32 @@ export async function performScrapingVertbaudet(url) {
     let elements = document.querySelectorAll("div.product-content");
     for (let element of elements) {
       // let imgUrl = element.querySelector("div.picture span.picture-container img")?.getAttribute("data-frz-src");
-      let imgUrl = element.querySelector("div.picture span.picture-container img");
 
       let brand = element.querySelector("div.product-informations div.brand a")?.textContent.trim();
       let title = element.querySelector("div.product-informations div.title a")?.textContent.trim();
       let link = element.querySelector("div.product-informations div.title a")?.href;
       let id = element.querySelector("div.product")?.getAttribute('data-productid');
+      let imgUrl = element.querySelector("div.picture span.picture-container img");
+      // const imageUrl = element.querySelector('div.picture span.picture-container img').getAttribute('src') || 
+      //            element.querySelector('div.picture span.picture-container img').getAttribute('data-src') || 
+      //            element.querySelector('div.picture span.picture-container img').getAttribute('data-lazy-src') || 
+      //            element.querySelector('div.picture span.picture-container source').getAttribute('srcset')
+
       
       let price = element.querySelector("div.product-informations div.pricecontainer span.price-value.public-price")?.textContent.trim();
     
       let clubPrice = element.querySelector('div.product-informations div.pricecontainer span.price-value.club-price')?.textContent.trim();
 
-      // if (imgUrl.startsWith("https") || imgUrl.startsWith("http")) {
+      // if (imageUrl.startsWith("https") || imageUrl.startsWith("http")) {
         products.push({
-          img: imgUrl?.getAttribute('src') || imgUrl?.getAttribute('data-src'),
-          // img: imgUrl,
+          // img: imageUrl,
           brand: brand,
           title: title,
           price: price,
           link: link,
           clubPrice: clubPrice,
+          img: imgUrl?.getAttribute('data-src') || imgUrl?.getAttribute('src') || imgUrl?.getAttribute('data-lazy-src'),
+
           // id: id,
 
         });

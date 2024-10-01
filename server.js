@@ -7,6 +7,8 @@ import { performScrapingVertbaudet } from "./src/scrapper.mjs";
 import { scrapingOkaidi } from "./src/scrapeOkaidi.mjs";
 
 import { saveApi } from "./src/lib.js";
+import cron from 'node-cron';
+
 
 const port = process.env.PORT;
 
@@ -95,28 +97,138 @@ app.get("/others", async (req, res) => {
   }
 });
 
-app.get("/all", async (req, res) => {
+// Planification d'une reload tous les jours à partir de minuit
+// cron.schedule('* * * * *', () => {
+//   console.log('Rechargement des données de produits...');
+//   app.get("/", async (req, res) => {
+//     const dataOther = await performScrapingVertbaudet(urlAll);
+//     const dataBiberon = await performScrapingVertbaudet(urlBiberon);
+//     const dataAllaitement = await performScrapingVertbaudet(urlAllaitement);
+//     const dataEveil = await performScrapingVertbaudet(urlEveil);
+//     const dataMode = await scrapingOkaidi(urlMode);
+//     const dataRoom = await performScrapingVertbaudet(urlRoom);
+//     const dataPoussette = await performScrapingVertbaudet(urlPoussette);
+  
+//     saveApi(dataBiberon, 'biberons');
+//     saveApi(dataAllaitement, 'allaitements');
+//     saveApi(dataOther, 'others');
+//     saveApi(dataEveil, 'eveils');
+//     saveApi(dataMode, 'modes');
+//     saveApi(dataRoom, 'rooms');
+//     saveApi(dataPoussette, 'poussettes');
+  
+//     res.json({
+//       status: "success",
+//       data:{
+//         'others': dataOther,
+//         'biberons': dataBiberon,
+//         'poussettes': dataPoussette,
+//         'modes': dataMode,
+//         'rooms': dataRoom,
+//         'eveils': dataEveil,
+//         'allaitements': dataAllaitement,
+//       }
+//     })    
+//   });
+// });
+
+
+// app.get("/all", async (req, res) => {
+//   try {
+//     const __dirname = path.dirname(fileURLToPath(import.meta.url));
+//     const modes = path.join(__dirname, "src/data/modes.json");
+//     const rooms = path.join(__dirname, "src/data/rooms.json");
+//     const biberons = path.join(__dirname, "src/data/biberons.json");
+//     const eveils = path.join(__dirname, "src/data/eveils.json");
+//     const allaitements = path.join(__dirname, "src/data/allaitements.json");
+//     const others = path.join(__dirname, "src/data/others.json");
+//     const poussettes = path.join(__dirname, "src/data/poussettes.json");
+
+//     const dataOther = JSON.parse(fs.readFileSync(others));
+//     const dataBiberon = JSON.parse(fs.readFileSync(biberons));
+//     const dataAllaitement = JSON.parse(fs.readFileSync(allaitements));
+//     const dataEveil = JSON.parse(fs.readFileSync(eveils));
+//     const dataMode = JSON.parse(fs.readFileSync(modes));
+//     const dataRoom = JSON.parse(fs.readFileSync(rooms));
+//     const dataPoussette = JSON.parse(fs.readFileSync(poussettes));
+
+//     res.json({
+//       status: "success",
+//       data:{
+//         'others': dataOther,
+//         'biberons': dataBiberon,
+//         'poussettes': dataPoussette,
+//         'modes': dataMode,
+//         'rooms': dataRoom,
+//         'eveils': dataEveil,
+//         'allaitements': dataAllaitement,
+//       }
+//     })
+
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
+
+
+
+//regroupement de toutes les url func dans une seule
+// app.get("/", async (req, res) => {
+//   const dataOther = await performScrapingVertbaudet(urlAll);
+//   const dataBiberon = await performScrapingVertbaudet(urlBiberon);
+//   const dataAllaitement = await performScrapingVertbaudet(urlAllaitement);
+//   const dataEveil = await performScrapingVertbaudet(urlEveil);
+//   const dataMode = await scrapingOkaidi(urlMode);
+//   const dataRoom = await performScrapingVertbaudet(urlRoom);
+//   const dataPoussette = await performScrapingVertbaudet(urlPoussette);
+
+//   saveApi(dataBiberon, 'biberons');
+//   saveApi(dataAllaitement, 'allaitements');
+//   saveApi(dataOther, 'others');
+//   saveApi(dataEveil, 'eveils');
+//   saveApi(dataMode, 'modes');
+//   saveApi(dataRoom, 'rooms');
+//   saveApi(dataPoussette, 'poussettes');
+
+//   res.json({
+//     status: "success",
+//     data:{
+//       'others': dataOther,
+//       'biberons': dataBiberon,
+//       'poussettes': dataPoussette,
+//       'modes': dataMode,
+//       'rooms': dataRoom,
+//       'eveils': dataEveil,
+//       'allaitements': dataAllaitement,
+//     }
+//   })    
+// });
+app.get("/", async (req, res) => {
   try {
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    const modes = path.join(__dirname, "src/data/modes.json");
-    const rooms = path.join(__dirname, "src/data/rooms.json");
-    const biberons = path.join(__dirname, "src/data/biberons.json");
-    const eveils = path.join(__dirname, "src/data/eveils.json");
-    const allaitements = path.join(__dirname, "src/data/allaitements.json");
-    const others = path.join(__dirname, "src/data/others.json");
-    const poussettes = path.join(__dirname, "src/data/poussettes.json");
+    // Exécution des appels de scraping en parallèle
+    const [dataOther, dataBiberon, dataAllaitement, dataEveil, dataMode, dataRoom, dataPoussette] = await Promise.all([
+      performScrapingVertbaudet(urlAll),
+      performScrapingVertbaudet(urlBiberon),
+      performScrapingVertbaudet(urlAllaitement),
+      performScrapingVertbaudet(urlEveil),
+      scrapingOkaidi(urlMode), // scraping pour Okaidi
+      performScrapingVertbaudet(urlRoom),
+      performScrapingVertbaudet(urlPoussette)
+    ]);
 
-    const dataOther = JSON.parse(fs.readFileSync(others));
-    const dataBiberon = JSON.parse(fs.readFileSync(biberons));
-    const dataAllaitement = JSON.parse(fs.readFileSync(allaitements));
-    const dataEveil = JSON.parse(fs.readFileSync(eveils));
-    const dataMode = JSON.parse(fs.readFileSync(modes));
-    const dataRoom = JSON.parse(fs.readFileSync(rooms));
-    const dataPoussette = JSON.parse(fs.readFileSync(poussettes));
+    // Sauvegarde des données après le scraping
+    saveApi(dataBiberon, 'biberons');
+    saveApi(dataAllaitement, 'allaitements');
+    saveApi(dataOther, 'others');
+    saveApi(dataEveil, 'eveils');
+    saveApi(dataMode, 'modes');
+    saveApi(dataRoom, 'rooms');
+    saveApi(dataPoussette, 'poussettes');
 
+    // Réponse JSON avec toutes les données
     res.json({
       status: "success",
-      data:{
+      data: {
         'others': dataOther,
         'biberons': dataBiberon,
         'poussettes': dataPoussette,
@@ -125,49 +237,15 @@ app.get("/all", async (req, res) => {
         'eveils': dataEveil,
         'allaitements': dataAllaitement,
       }
-    })
-
+    });
   } catch (error) {
-    res.status(500).send(error.message);
+    // Gestion des erreurs
+    console.error("Error during scraping or saving data:", error);
+    res.status(500).json({ status: "error", message: "An error occurred during scraping or saving data" });
   }
 });
 
 
-
-
-//regroupement de toutes les url func dans une seule
-
-
-app.get("/", async (req, res) => {
-  const dataOther = await performScrapingVertbaudet(urlAll);
-  const dataBiberon = await performScrapingVertbaudet(urlBiberon);
-  const dataAllaitement = await performScrapingVertbaudet(urlAllaitement);
-  const dataEveil = await performScrapingVertbaudet(urlEveil);
-  const dataMode = await scrapingOkaidi(urlMode);
-  const dataRoom = await performScrapingVertbaudet(urlRoom);
-  const dataPoussette = await performScrapingVertbaudet(urlPoussette);
-
-  saveApi(dataBiberon, 'biberons');
-  saveApi(dataAllaitement, 'allaitements');
-  saveApi(dataOther, 'others');
-  saveApi(dataEveil, 'eveils');
-  saveApi(dataMode, 'modes');
-  saveApi(dataRoom, 'rooms');
-  saveApi(dataPoussette, 'poussettes');
-
-  res.json({
-    status: "success",
-    data:{
-      'others': dataOther,
-      'biberons': dataBiberon,
-      'poussettes': dataPoussette,
-      'modes': dataMode,
-      'rooms': dataRoom,
-      'eveils': dataEveil,
-      'allaitements': dataAllaitement,
-    }
-  })    
-});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
