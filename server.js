@@ -18,7 +18,7 @@ const urlRoom= process.env.URLROOMS;
 const urlMode= process.env.URLMODES;
 const urlEveil= process.env.URLEVEILS;
 const urlAllaitement= process.env.URLALLAITEMENTS;
-const urlBiberon= process.env.URLBIBERONS;
+const urlToilette= process.env.URLTOILETTES;
 
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
@@ -36,15 +36,15 @@ app.get("/poussettes", async (req, res) => {
 });
 
 
-app.get("/rooms", async (req, res) => {
-  try {
-    const dataRoom = await performScrapingVertbaudet(urlRoom);
-    saveApi(dataRoom, 'rooms');
-    res.json(dataRoom);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
+// app.get("/rooms", async (req, res) => {
+//   try {
+//     const dataRoom = await performScrapingVertbaudet(urlRoom);
+//     saveApi(dataRoom, 'rooms');
+//     res.json(dataRoom);
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
 
 app.get("/modes", async (req, res) => {
   try {
@@ -57,45 +57,45 @@ app.get("/modes", async (req, res) => {
   }
 });
 
-app.get("/eveils", async (req, res) => {
-  try {
-    const dataEveil = await performScrapingVertbaudet(urlEveil);
-    saveApi(dataEveil, 'eveils');
-    res.json(dataEveil);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
+// app.get("/eveils", async (req, res) => {
+//   try {
+//     const dataEveil = await performScrapingVertbaudet(urlEveil);
+//     saveApi(dataEveil, 'eveils');
+//     res.json(dataEveil);
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
 
-app.get("/allaitements", async (req, res) => {
-  try {
-    const dataAllaitement = await performScrapingVertbaudet(urlAllaitement);
-    saveApi(dataAllaitement, 'allaitements');
-    res.json(dataAllaitement);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
+// app.get("/allaitements", async (req, res) => {
+//   try {
+//     const dataAllaitement = await performScrapingVertbaudet(urlAllaitement);
+//     saveApi(dataAllaitement, 'allaitements');
+//     res.json(dataAllaitement);
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
 
-app.get("/biberons", async (req, res) => {
-  try {
-    const dataBiberon = await performScrapingVertbaudet(urlBiberon);
-    saveApi(dataBiberon, 'biberons');
-    res.json(dataBiberon);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
+// app.get("/toilette", async (req, res) => {
+//   try {
+//     const dataToilette = await performScrapingVertbaudet(urlToilette);
+//     saveApi(dataToilette, 'toilettes');
+//     res.json(dataToilette);
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
 
-app.get("/others", async (req, res) => {
-  try {
-    const dataOther = await performScrapingVertbaudet(urlAll);
-    saveApi(dataOther, 'others');
-    res.json(dataOther);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
+// app.get("/others", async (req, res) => {
+//   try {
+//     const dataOther = await performScrapingVertbaudet(urlAll);
+//     saveApi(dataOther, 'others');
+//     res.json(dataOther);
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
 
 // Planification d'une reload tous les jours à partir de minuit
 // cron.schedule('* * * * *', () => {
@@ -203,12 +203,54 @@ app.get("/others", async (req, res) => {
 //     }
 //   })    
 // });
+// app.get("/", async (req, res) => {
+//   try {
+//     // Exécution des appels de scraping en parallèle
+//     const [dataOther, dataBiberon, dataAllaitement, dataEveil, dataMode, dataRoom, dataPoussette] = await Promise.all([
+//       performScrapingVertbaudet(urlAll),
+//       performScrapingVertbaudet(urlBiberon),
+//       performScrapingVertbaudet(urlAllaitement),
+//       performScrapingVertbaudet(urlEveil),
+//       scrapingOkaidi(urlMode), // scraping pour Okaidi
+//       performScrapingVertbaudet(urlRoom),
+//       performScrapingVertbaudet(urlPoussette)
+//     ]);
+
+//     // Sauvegarde des données après le scraping
+//     saveApi(dataBiberon, 'biberons');
+//     saveApi(dataAllaitement, 'allaitements');
+//     saveApi(dataOther, 'others');
+//     saveApi(dataEveil, 'eveils');
+//     saveApi(dataMode, 'modes');
+//     saveApi(dataRoom, 'rooms');
+//     saveApi(dataPoussette, 'poussettes');
+
+//     // Réponse JSON avec toutes les données
+//     res.json({
+//       status: "success",
+//       data: {
+//         'others': dataOther,
+//         'biberons': dataBiberon,
+//         'poussettes': dataPoussette,
+//         'modes': dataMode,
+//         'rooms': dataRoom,
+//         'eveils': dataEveil,
+//         'allaitements': dataAllaitement,
+//       }
+//     });
+//   } catch (error) {
+//     // Gestion des erreurs
+//     console.error("Error during scraping or saving data:", error);
+//     res.status(500).json({ status: "error", message: "An error occurred during scraping or saving data" });
+//   }
+// });
+
 app.get("/", async (req, res) => {
   try {
     // Exécution des appels de scraping en parallèle
-    const [dataOther, dataBiberon, dataAllaitement, dataEveil, dataMode, dataRoom, dataPoussette] = await Promise.all([
+    const [dataOther, dataRoom, dataToilette, dataAllaitement, dataEveil, dataMode, dataPoussette] = await Promise.all([
       performScrapingVertbaudet(urlAll),
-      performScrapingVertbaudet(urlBiberon),
+      performScrapingVertbaudet(urlToilette),
       performScrapingVertbaudet(urlAllaitement),
       performScrapingVertbaudet(urlEveil),
       scrapingOkaidi(urlMode), // scraping pour Okaidi
@@ -217,7 +259,7 @@ app.get("/", async (req, res) => {
     ]);
 
     // Sauvegarde des données après le scraping
-    saveApi(dataBiberon, 'biberons');
+    saveApi(dataToilette, 'toilettes');
     saveApi(dataAllaitement, 'allaitements');
     saveApi(dataOther, 'others');
     saveApi(dataEveil, 'eveils');
@@ -230,7 +272,7 @@ app.get("/", async (req, res) => {
       status: "success",
       data: {
         'others': dataOther,
-        'biberons': dataBiberon,
+        'toilettes': dataToilette,
         'poussettes': dataPoussette,
         'modes': dataMode,
         'rooms': dataRoom,
@@ -244,8 +286,6 @@ app.get("/", async (req, res) => {
     res.status(500).json({ status: "error", message: "An error occurred during scraping or saving data" });
   }
 });
-
-
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

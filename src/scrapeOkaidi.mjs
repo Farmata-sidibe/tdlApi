@@ -6,7 +6,21 @@ puppeteer.use(StealthPlugin());
 export async function scrapingOkaidi(url) {
   let browser;
   try {
-    browser = await puppeteer.launch({ headless: true });
+    browser = await puppeteer.launch({ 
+      headless: true ,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process', // Ajoute cet argument pour éviter les problèmes multi-processus
+        '--disable-background-networking',
+        '--disable-software-rasterizer'
+      ]
+    });
     const page = await browser.newPage();
   
     try {
@@ -23,7 +37,7 @@ export async function scrapingOkaidi(url) {
     });
   
     // wait for 5 seconds to allow more products to load
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 60000));
   
     const products = await page.evaluate(() => {
       let products = [];
