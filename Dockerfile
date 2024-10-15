@@ -27,7 +27,8 @@ RUN apt-get update && apt-get install -y \
   libcurl4 \
   libexif12 \
   xdg-utils \
-  --no-install-recommends
+  --no-install-recommends && \
+  apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Réduire npm à une version plus stable
 RUN npm install -g npm@8
@@ -39,10 +40,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Installer les dépendances du projet
-RUN npm install
-
-# Installer Puppeteer
-RUN npm install puppeteer --loglevel verbose
+RUN npm install --loglevel verbose
 
 # Copier le reste des fichiers du projet
 COPY . .

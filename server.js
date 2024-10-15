@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
 import app from "./app.mjs";
-import { performScrapingVertbaudet } from "./src/scrapper.mjs";
+import { performScrapingRedoute } from "./src/scrapper.mjs";
 import { scrapingOkaidi } from "./src/scrapeOkaidi.mjs";
 
 import { saveApi } from "./src/lib.js";
@@ -98,39 +98,39 @@ app.get("/modes", async (req, res) => {
 // });
 
 // Planification d'une reload tous les jours à partir de minuit
-// cron.schedule('* * * * *', () => {
-//   console.log('Rechargement des données de produits...');
-//   app.get("/", async (req, res) => {
-//     const dataOther = await performScrapingVertbaudet(urlAll);
-//     const dataBiberon = await performScrapingVertbaudet(urlBiberon);
-//     const dataAllaitement = await performScrapingVertbaudet(urlAllaitement);
-//     const dataEveil = await performScrapingVertbaudet(urlEveil);
-//     const dataMode = await scrapingOkaidi(urlMode);
-//     const dataRoom = await performScrapingVertbaudet(urlRoom);
-//     const dataPoussette = await performScrapingVertbaudet(urlPoussette);
+cron.schedule('0 0 * * *', () => {
+  console.log('Rechargement des données de produits...');
+  app.get("/", async (req, res) => {
+    const dataOther = await performScrapingRedoute(urlAll);
+    const dataToilette = await performScrapingRedoute(urlToilette);
+    const dataAllaitement = await performScrapingRedoute(urlAllaitement);
+    const dataEveil = await performScrapingRedoute(urlEveil);
+    const dataMode = await scrapingOkaidi(urlMode);
+    const dataRoom = await performScrapingRedoute(urlRoom);
+    const dataPoussette = await performScrapingRedoute(urlPoussette);
   
-//     saveApi(dataBiberon, 'biberons');
-//     saveApi(dataAllaitement, 'allaitements');
-//     saveApi(dataOther, 'others');
-//     saveApi(dataEveil, 'eveils');
-//     saveApi(dataMode, 'modes');
-//     saveApi(dataRoom, 'rooms');
-//     saveApi(dataPoussette, 'poussettes');
+    saveApi(dataToilette, 'toilettes');
+    saveApi(dataAllaitement, 'allaitements');
+    saveApi(dataOther, 'others');
+    saveApi(dataEveil, 'eveils');
+    saveApi(dataMode, 'modes');
+    saveApi(dataRoom, 'rooms');
+    saveApi(dataPoussette, 'poussettes');
   
-//     res.json({
-//       status: "success",
-//       data:{
-//         'others': dataOther,
-//         'biberons': dataBiberon,
-//         'poussettes': dataPoussette,
-//         'modes': dataMode,
-//         'rooms': dataRoom,
-//         'eveils': dataEveil,
-//         'allaitements': dataAllaitement,
-//       }
-//     })    
-//   });
-// });
+    res.json({
+      status: "success",
+      data:{
+        'others': dataOther,
+        'toilettes': dataToilette,
+        'poussettes': dataPoussette,
+        'modes': dataMode,
+        'rooms': dataRoom,
+        'eveils': dataEveil,
+        'allaitements': dataAllaitement,
+      }
+    })    
+  });
+});
 
 
 // app.get("/all", async (req, res) => {
@@ -245,46 +245,79 @@ app.get("/modes", async (req, res) => {
 //   }
 // });
 
+// app.get("/", async (req, res) => {
+//   try {
+//     console.log("Starting scraping process...");
+//     console.log(urlAll, urlAllaitement, urlEveil, urlMode, urlPoussette, urlRoom, urlToilette);
+//     const [dataOther, dataRoom, dataToilette, dataAllaitement, dataEveil, dataMode, dataPoussette] = await Promise.all([
+//       performScrapingRedoute(urlAll),
+//       performScrapingRedoute(urlToilette),
+//       performScrapingRedoute(urlAllaitement),
+//       performScrapingRedoute(urlEveil),
+//       scrapingOkaidi(urlMode),
+//       performScrapingRedoute(urlRoom),
+//       performScrapingRedoute(urlPoussette)
+//     ]);
+
+//     console.log("Scraping completed, starting to save data...");
+
+//     saveApi(dataToilette, 'toilettes');
+//     saveApi(dataAllaitement, 'allaitements');
+//     saveApi(dataOther, 'others');
+//     saveApi(dataEveil, 'eveils');
+//     saveApi(dataMode, 'modes');
+//     saveApi(dataRoom, 'rooms');
+//     saveApi(dataPoussette, 'poussettes');
+
+//     console.log("All data saved successfully");
+
+//     res.json({
+//       status: "success",
+//       data: {
+//         'others': dataOther,
+//         'toilettes': dataToilette,
+//         'poussettes': dataPoussette,
+//         'modes': dataMode,
+//         'rooms': dataRoom,
+//         'eveils': dataEveil,
+//         'allaitements': dataAllaitement,
+//       }
+//     });
+//   } catch (error) {
+//     console.error("Error during scraping or saving data:", error);
+//     res.status(500).json({ status: "error", message: "An error occurred during scraping or saving data" });
+//   }
+// });
+
 app.get("/", async (req, res) => {
-  try {
-    // Exécution des appels de scraping en parallèle
-    const [dataOther, dataRoom, dataToilette, dataAllaitement, dataEveil, dataMode, dataPoussette] = await Promise.all([
-      performScrapingVertbaudet(urlAll),
-      performScrapingVertbaudet(urlToilette),
-      performScrapingVertbaudet(urlAllaitement),
-      performScrapingVertbaudet(urlEveil),
-      scrapingOkaidi(urlMode), // scraping pour Okaidi
-      performScrapingVertbaudet(urlRoom),
-      performScrapingVertbaudet(urlPoussette)
-    ]);
+  const dataOther = await performScrapingRedoute(urlAll);
+  const dataToilette = await performScrapingRedoute(urlToilette);
+  const dataAllaitement = await performScrapingRedoute(urlAllaitement);
+  const dataEveil = await performScrapingRedoute(urlEveil);
+  const dataMode = await scrapingOkaidi(urlMode);
+  const dataRoom = await performScrapingRedoute(urlRoom);
+  const dataPoussette = await performScrapingRedoute(urlPoussette);
 
-    // Sauvegarde des données après le scraping
-    saveApi(dataToilette, 'toilettes');
-    saveApi(dataAllaitement, 'allaitements');
-    saveApi(dataOther, 'others');
-    saveApi(dataEveil, 'eveils');
-    saveApi(dataMode, 'modes');
-    saveApi(dataRoom, 'rooms');
-    saveApi(dataPoussette, 'poussettes');
+  saveApi(dataToilette, 'toilettes');
+  saveApi(dataAllaitement, 'allaitements');
+  saveApi(dataOther, 'others');
+  saveApi(dataEveil, 'eveils');
+  saveApi(dataMode, 'modes');
+  saveApi(dataRoom, 'rooms');
+  saveApi(dataPoussette, 'poussettes');
 
-    // Réponse JSON avec toutes les données
-    res.json({
-      status: "success",
-      data: {
-        'others': dataOther,
-        'toilettes': dataToilette,
-        'poussettes': dataPoussette,
-        'modes': dataMode,
-        'rooms': dataRoom,
-        'eveils': dataEveil,
-        'allaitements': dataAllaitement,
-      }
-    });
-  } catch (error) {
-    // Gestion des erreurs
-    console.error("Error during scraping or saving data:", error);
-    res.status(500).json({ status: "error", message: "An error occurred during scraping or saving data" });
-  }
+  res.json({
+    status: "success",
+    data:{
+      'others': dataOther,
+      'toilettes': dataToilette,
+      'poussettes': dataPoussette,
+      'modes': dataMode,
+      'rooms': dataRoom,
+      'eveils': dataEveil,
+      'allaitements': dataAllaitement,
+    }
+  })    
 });
 
 app.listen(port, () => {

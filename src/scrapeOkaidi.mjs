@@ -10,15 +10,23 @@ export async function scrapingOkaidi(url) {
       headless: true ,
       args: [
         '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process', // Ajoute cet argument pour éviter les problèmes multi-processus
-        '--disable-background-networking',
-        '--disable-software-rasterizer'
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+    '--disable-accelerated-2d-canvas',
+    '--no-first-run',
+    '--no-zygote',
+    '--single-process',
+    '--disable-background-networking',
+    '--disable-software-rasterizer',
+    '--disable-extensions',
+    '--disable-sync',
+    '--disable-default-apps',
+    '--mute-audio',
+    '--disable-gl-drawing-for-tests',
+    '--disable-breakpad',
+    '--disable-crash-reporter',
+    '--window-size=1920,1080'
       ]
     });
     const page = await browser.newPage();
@@ -37,7 +45,7 @@ export async function scrapingOkaidi(url) {
     });
   
     // wait for 5 seconds to allow more products to load
-    await new Promise((resolve) => setTimeout(resolve, 60000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   
     const products = await page.evaluate(() => {
       let products = [];
