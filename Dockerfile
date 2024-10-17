@@ -31,22 +31,33 @@ RUN apt-get update && apt-get install -y \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Réduire npm à une version plus stable
-RUN npm install -g npm@8
+#RUN npm install -g npm@8
 
 # Créer le dossier de travail
 WORKDIR /usr/src/app
 
-# Copier le fichier package.json et package-lock.json
+# Copier uniquement les fichiers package.json et package-lock.json pour installer les dépendances en premier
 COPY package*.json ./
 
 # Installer les dépendances du projet
 RUN npm install --loglevel verbose
 
+RUN npx puppeteer browsers install chrome
 # Copier le reste des fichiers du projet
 COPY . .
+
+# Vérifier les fichiers et les modules installés
+RUN ls -la /usr/src/app && npm list
 
 # Exposer le port
 EXPOSE 8081
 
 # Lancer l'application
-CMD ["npm", "start"]
+#CMD ["npm", "start"]
+# Copier le script de démarrage
+COPY ./scripts/init.sh /init.sh
+RUN chmod +x /init.sh
+
+# Exécuter le script de démarrage au démarrage du conteneur
+#CMD ["/init.sh"]
+ENTRYPOINT ["/init.sh"]
