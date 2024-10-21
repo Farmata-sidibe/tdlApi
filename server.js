@@ -173,54 +173,42 @@ app.get("/", async (req, res) => {
   });
 });
 
-// app.get("/", async (req, res) => {
-//   try {
-//     // Exécuter les appels en parallèle
-//     const [
-//       dataOther,
-//       dataToilette,
-//       dataAllaitement,
-//       dataEveil,
-//       dataMode,
-//       dataRoom,
-//       dataPoussette
-//     ] = await Promise.all([
-//       performScrapingRedoute(urlAll),
-//       performScrapingRedoute(urlToilette),
-//       performScrapingRedoute(urlAllaitement),
-//       performScrapingRedoute(urlEveil),
-//       scrapingOkaidi(urlMode),
-//       performScrapingRedoute(urlRoom),
-//       performScrapingRedoute(urlPoussette)
-//     ]);
+app.get("/product", async (req, res) => {
+  try {
+    // Exécuter les appels en parallèle
+    const [dataOther,dataToilette,dataAllaitement,dataEveil,dataMode,dataRoom,dataPoussette
+    ] = await Promise.all([performScrapingRedoute(urlAll),performScrapingRedoute(urlToilette),performScrapingRedoute(urlAllaitement),performScrapingRedoute(urlEveil),scrapingOkaidi(urlMode),
+      performScrapingRedoute(urlRoom),
+      performScrapingRedoute(urlPoussette)
+    ]);
 
-//     // Sauvegarde des données
-//     saveApi(dataToilette, 'toilettes');
-//     saveApi(dataAllaitement, 'allaitements');
-//     saveApi(dataOther, 'others');
-//     saveApi(dataEveil, 'eveils');
-//     saveApi(dataMode, 'modes');
-//     saveApi(dataRoom, 'rooms');
-//     saveApi(dataPoussette, 'poussettes');
+    // Sauvegarde des données
+    saveApi(dataToilette, 'toilettes');
+    saveApi(dataAllaitement, 'allaitements');
+    saveApi(dataOther, 'others');
+    saveApi(dataEveil, 'eveils');
+    saveApi(dataMode, 'modes');
+    saveApi(dataRoom, 'rooms');
+    saveApi(dataPoussette, 'poussettes');
 
-//     // Envoi de la réponse
-//     res.json({
-//       status: "success",
-//       data: {
-//         'others': dataOther,
-//         'toilettes': dataToilette,
-//         'poussettes': dataPoussette,
-//         'modes': dataMode,
-//         'rooms': dataRoom,
-//         'eveils': dataEveil,
-//         'allaitements': dataAllaitement,
-//       }
-//     });
-//   } catch (error) {
-//     console.error("Error during scraping:", error);
-//     res.status(500).json({ status: "error", message: "Scraping failed" });
-//   }
-// });
+    // Envoi de la réponse
+    res.json({
+      status: "success",
+      data: {
+        'others': dataOther,
+        'toilettes': dataToilette,
+        'poussettes': dataPoussette,
+        'modes': dataMode,
+        'rooms': dataRoom,
+        'eveils': dataEveil,
+        'allaitements': dataAllaitement,
+      }
+    });
+  } catch (error) {
+    console.error("Error during scraping:", error);
+    res.status(500).json({ status: "error", message: "Scraping failed" });
+  }
+});
 
 
 

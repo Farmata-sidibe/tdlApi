@@ -29,10 +29,6 @@ RUN apt-get update && apt-get install -y \
   xdg-utils \
   --no-install-recommends && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Réduire npm à une version plus stable
-#RUN npm install -g npm@8
-
 # Créer le dossier de travail
 WORKDIR /usr/src/app
 
