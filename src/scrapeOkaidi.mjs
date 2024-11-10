@@ -2,32 +2,32 @@ import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 
 puppeteer.use(StealthPlugin());
-
+export const args = [
+  '--no-sandbox',
+  '--disable-setuid-sandbox',
+  '--disable-dev-shm-usage',
+  '--disable-gpu',
+  '--disable-accelerated-2d-canvas',
+  '--no-first-run',
+  '--no-zygote',
+  '--single-process',
+  '--disable-background-networking',
+  '--disable-software-rasterizer',
+  '--disable-extensions',
+  '--disable-sync',
+  '--disable-default-apps',
+  '--mute-audio',
+  '--disable-gl-drawing-for-tests',
+  '--disable-breakpad',
+  '--disable-crash-reporter',
+  '--window-size=1920,1080'
+]
 export async function scrapingOkaidi(url) {
   let browser;
   try {
     browser = await puppeteer.launch({ 
       headless: true ,
-      args: [
-        '--no-sandbox',
-    '--disable-setuid-sandbox',
-    '--disable-dev-shm-usage',
-    '--disable-gpu',
-    '--disable-accelerated-2d-canvas',
-    '--no-first-run',
-    '--no-zygote',
-    '--single-process',
-    '--disable-background-networking',
-    '--disable-software-rasterizer',
-    '--disable-extensions',
-    '--disable-sync',
-    '--disable-default-apps',
-    '--mute-audio',
-    '--disable-gl-drawing-for-tests',
-    '--disable-breakpad',
-    '--disable-crash-reporter',
-    '--window-size=1920,1080'
-      ]
+      args: args,
     });
     const page = await browser.newPage();
   
